@@ -1,26 +1,17 @@
-# Image installs with latest Java 8 OpenJDK on Alpine Linux
 FROM openjdk:8-jdk-alpine
 
-USER root
-
 ENV SWARM_CLIENT_VERSION="3.9" \
-    COMMAND_OPTIONS=""
+    DOCKER_COMPOSE_VERSION="1.19.0" \
+    COMMAND_OPTIONS="" \
+    USER_NAME_SECRET="" \
+    PASSWORD_SECRET=""
 
-# Update and upgrade apk then install curl, maven, git, and nodejs
 RUN adduser -G root -D jenkins && \
-  apk update && \
-	apk upgrade && \
-	apk --no-cache add curl && \
-	apk --no-cache add wget && \
-	apk --no-cache add maven && \
-	apk --no-cache add git && \
-	apk --no-cache add docker
+    apk --update --no-cache add maven python py-pip git openssh ca-certificates openssl && \
+    wget -q https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VERSION}/swarm-client-${SWARM_CLIENT_VERSION}.jar -P /home/jenkins/ && \
+    pip install docker-compose
 
-
-# Download the latest Jenkins swarm client with curl - version 3.3
-# Browse all versions here: https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/
-RUN wget https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VERSION}/swarm-client-${SWARM_CLIENT_VERSION}.jar -P /home/jenkins/
-ADD run.sh /run.sh
+COPY run.sh /run.sh
 RUN chmod +x /run.sh
 
 CMD ["/bin/sh", "/run.sh"]
