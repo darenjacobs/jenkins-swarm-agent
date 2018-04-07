@@ -9,6 +9,7 @@ ENV SWARM_CLIENT_VERSION="3.9" \
 RUN adduser -G root -D jenkins && \
     apk --update --no-cache add maven python py-pip git openssh ca-certificates openssl && \
     wget -q https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VERSION}/swarm-client-${SWARM_CLIENT_VERSION}.jar -P /home/jenkins/ && \
+    pip install --upgrade pip && \
     pip install docker-compose
 
 COPY run.sh /run.sh
